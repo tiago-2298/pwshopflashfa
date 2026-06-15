@@ -47,35 +47,36 @@ export async function updateCell(sheet, row, col, value) {
   } catch(_) {}
 }
 
-export async function updateRow(sheet, row, values) {
+function parseDate(str) {
+  if (!str) return new Date(0);
   try {
-    const { sheets, spreadsheetId } = await getSheets();
-    const endCol = String.fromCharCode(64 + values.length);
-    await sheets.spreadsheets.values.update({
-      spreadsheetId, range: `${sheet}!A${row}:${endCol}${row}`,
-      valueInputOption: 'USER_ENTERED', requestBody: { values: [values] },
-    });
-  } catch(_) {}
+    const [datePart] = str.split(' ');
+    const [d,m,y] = datePart.split('/');
+    return new Date(`${y}-${m}-${d}`);
+  } catch(_){ return new Date(0); }
 }
 
-// ── Mise à jour ligne employé dans Comptabilité ───────────────────────────────
-// Colonnes du tableau (d'après la capture) :
-// A:ID / B:Nom+Prénom / C:Poste / D:Téléphone / E:IBAN / F:Date arrivée / G:Ancienneté
-// H:CA / I:Bénéfice / J:Primes Hebdo / K:Primes Hebdomadaire / L:Primes Mensuel / M:Primes Mensuelles
-// N:Salaire / O:Salaire Versé / P:Heures / Q:Tarif / R:Salaire
+// ── Mise à jour tableau Comptabilité ─────────────────────────────────────────
+// Structure à partir de C5 :
+// C=ID | D=Nom+Prénom | E=Date naissance | F=Poste | G=Numéro | H=Date arrivée | I=CA | J=Bénéfice
+// K et après → on ne touche pas
 
 export async function mettreAJourComptabilite(nomEmploye) {
   try {
     const { sheets, spreadsheetId } = await getSheets();
 
-    // 1. Récupérer les infos de l'employé
-    const empRows = await readRange('Employes!A2:G200');
+    // 1. Infos employé (A=username B=pass C=nom D=grade E=tel F=iban G=derniere_co H=date_naissance)
+    const empRows = await readRange('Employes!A2:H200');
     const emp = empRows.find(r => r[2] === nomEmploye);
     if (!emp) return;
 
-    const [username, password, nom, grade, tel, iban, dateArrivee] = emp;
+    const nom          = emp[2] || '';
+    const grade        = emp[3] || '';
+    const tel          = emp[4] || '';
+    const dateArrivee  = emp[6] ? parseDate(emp[6]).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR');
+    const dateNaissance= emp[7] || '';
 
-    // 2. Calculer CA et Bénéfice de la semaine (lundi→dimanche)
+    // 2. Calcul CA et Bénéfice semaine (lundi→dimanche)
     const now = new Date();
     const jour = now.getDay();
     const diffLundi = (jour === 0 ? -6 : 1 - jour);
@@ -86,122 +87,81 @@ export async function mettreAJourComptabilite(nomEmploye) {
     dimanche.setDate(lundi.getDate() + 6);
     dimanche.setHours(23,59,59,999);
 
-    function parseDate(str) {
-      if (!str) return new Date(0);
-      try {
-        const [datePart] = str.split(' ');
-        const [d,m,y] = datePart.split('/');
-        return new Date(`${y}-${m}-${d}`);
-      } catch(_){ return new Date(0); }
-    }
-
     let caSemaine = 0, benefSemaine = 0;
 
-    // Rachats
     try {
       const rows = await readRange(`Compta_${nom}!A2:I500`);
       for (const r of rows) {
         const d = parseDate(r[0]);
         if (d >= lundi && d <= dimanche) {
-          caSemaine   += parseFloat(r[7]||0);
+          caSemaine    += parseFloat(r[7]||0);
           benefSemaine += parseFloat(r[6]||0);
         }
       }
     } catch(_) {}
 
-    // Ventes catalogue
     try {
       const rows = await readRange('Ventes!A2:I500');
       for (const r of rows) {
         if (r[1] !== nom) continue;
         const d = parseDate(r[0]);
         if (d >= lundi && d <= dimanche) {
-          caSemaine   += parseFloat(r[7]||0);
+          caSemaine    += parseFloat(r[7]||0);
           benefSemaine += parseFloat(r[8]||0);
         }
       }
     } catch(_) {}
 
-    // 3. Calculer salaire
-    const PAIE = {
-      'Patron':              { base: 20000, taux: 0 },
-      'Co-Patronne':         { base: 20000, taux: 0 },
-      'Responsable':         { base: 10000, taux: 0.45 },
-      'Commercial Expert':   { base: 0,     taux: 0.33 },
-      'Commercial Confirmé': { base: 0,     taux: 0.30 },
-      'Commercial Débutant': { base: 0,     taux: 0.27 },
-    };
-    const p = PAIE[grade] || { base: 0, taux: 0 };
-    const commission = Math.round(benefSemaine * p.taux);
-    const salaire = p.base + commission;
-
-    // 4. Ancienneté en jours
-    let anciennete = '';
-    if (dateArrivee) {
-      const debut = parseDate(dateArrivee);
-      const diff = Math.floor((now - debut) / (1000*60*60*24));
-      anciennete = diff > 0 ? `${diff} jours` : '0 jours';
-    }
-
-    // 5. Trouver la ligne de l'employé dans Comptabilité (colonne B = nom)
-    const compRows = await readRange('Comptabilité!A2:R200');
+    // 3. Trouver la ligne dans Comptabilité (colonne D = nom, à partir de ligne 5)
+    // Les données commencent en C5, donc D5 = Nom+Prénom
+    const compRows = await readRange('Comptabilité!C5:J200');
     let ligneIndex = -1;
     let idMax = 0;
 
     for (let i = 0; i < compRows.length; i++) {
       const id = parseInt(compRows[i][0]||0);
       if (id > idMax) idMax = id;
-      if (compRows[i][1] === nom) { ligneIndex = i + 2; break; }
+      // D = index 1 dans notre lecture (C=0, D=1)
+      if (compRows[i][1] === nom) {
+        ligneIndex = i + 5; // ligne réelle dans le sheet (5 = première ligne données)
+        break;
+      }
     }
 
+    const nouvelId = ligneIndex === -1 ? idMax + 1 : parseInt(compRows[ligneIndex-5]?.[0]||idMax+1);
+
+    // 4. Valeurs à écrire : C=ID, D=Nom, E=DateNaissance, F=Poste, G=Numéro, H=DateArrivée, I=CA, J=Bénéfice
     const valeurs = [
-      ligneIndex === -1 ? idMax + 1 : parseInt(compRows[ligneIndex-2]?.[0]||idMax+1), // A: ID
-      nom,          // B: Nom+Prénom
-      grade,        // C: Poste
-      tel||'',      // D: Téléphone
-      iban||'',     // E: IBAN
-      dateArrivee||new Date().toLocaleDateString('fr-FR'), // F: Date arrivée
-      anciennete,   // G: Ancienneté
-      caSemaine,    // H: CA
-      benefSemaine, // I: Bénéfice
-      '',           // J: Primes Hebdo (manuel)
-      '',           // K: Primes Hebdomadaire (manuel)
-      '',           // L: Primes Mensuel (manuel)
-      '',           // M: Primes Mensuelles (manuel)
-      salaire,      // N: Salaire
-      '',           // O: Salaire Versé (manuel)
-      '',           // P: Heures (manuel)
-      '',           // Q: Tarif (manuel)
-      salaire,      // R: Salaire final
+      nouvelId,      // C: ID perso
+      nom,           // D: Nom + Prénom
+      dateNaissance, // E: Date de naissance
+      grade,         // F: Poste
+      tel,           // G: Numéro
+      dateArrivee,   // H: Date d'arrivée
+      caSemaine,     // I: CA
+      benefSemaine,  // J: Bénéfice
     ];
 
     if (ligneIndex === -1) {
-      // Nouvelle ligne
-      await sheets.spreadsheets.values.append({
-        spreadsheetId, range: 'Comptabilité!A2',
-        valueInputOption: 'USER_ENTERED', requestBody: { values: [valeurs] },
+      // Nouvelle ligne — on cherche la prochaine ligne vide à partir de C5
+      const nextRow = 5 + compRows.filter(r => r[0]).length;
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `Comptabilité!C${nextRow}:J${nextRow}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [valeurs] },
       });
     } else {
-      // Mettre à jour uniquement les colonnes non-manuelles
-      // A,B,C,D,E,F,G,H,I,N,R (on ne touche pas J,K,L,M,O,P,Q)
-      const colsToUpdate = [
-        {col:1, val:valeurs[0]},  // A: ID
-        {col:2, val:valeurs[1]},  // B: Nom
-        {col:3, val:valeurs[2]},  // C: Poste
-        {col:4, val:valeurs[3]},  // D: Téléphone
-        {col:5, val:valeurs[4]},  // E: IBAN
-        {col:6, val:valeurs[5]},  // F: Date arrivée
-        {col:7, val:valeurs[6]},  // G: Ancienneté
-        {col:8, val:valeurs[7]},  // H: CA
-        {col:9, val:valeurs[8]},  // I: Bénéfice
-        {col:14,val:valeurs[13]}, // N: Salaire
-        {col:18,val:valeurs[17]}, // R: Salaire final
-      ];
-      for (const {col, val} of colsToUpdate) {
-        await updateCell('Comptabilité', ligneIndex, col, val);
-      }
+      // Mise à jour ligne existante — seulement C à J, on ne touche pas K+
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `Comptabilité!C${ligneIndex}:J${ligneIndex}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [valeurs] },
+      });
     }
+
   } catch(e) {
-    console.error('Erreur mise à jour Comptabilité:', e);
+    console.error('Erreur Comptabilité:', e.message);
   }
 }
