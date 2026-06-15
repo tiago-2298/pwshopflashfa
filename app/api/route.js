@@ -360,8 +360,9 @@ export async function POST(req) {
   if (action === 'addEmploye') {
     try {
       if(!GRADES_ADMIN.includes(body.grade)) return NextResponse.json({ok:false,error:'Accès refusé.'},{status:403});
-      const { username, password, nom, gradeNew, tel, iban } = body;
-      await appendRow('Employes',[username,password,nom,gradeNew,tel||'',iban||'','']);
+      const { username, password, nom, gradeNew, tel, iban, dateNaissance } = body;
+      const dateArrivee = new Date().toLocaleDateString('fr-FR');
+      await appendRow('Employes',[username,password,nom,gradeNew,tel||'',iban||'','',dateNaissance||'',dateArrivee]);
       await ensureSheet(`Compta_${nom}`,['Date','Client_Nom','Client_Tel','Client_IBAN','Objet','Quantite','Benefice_Genere','Total_Du_Client','Type']);
       await mettreAJourComptabilite(nom);
       return NextResponse.json({ok:true});
