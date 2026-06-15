@@ -121,9 +121,9 @@ export async function mettreAJourComptabilite(nomEmploye) {
     for (let i = 0; i < compRows.length; i++) {
       const id = parseInt(compRows[i][0]||0);
       if (id > idMax) idMax = id;
-      // D = index 1 dans notre lecture (C=0, D=1)
-      if (compRows[i][1] === nom) {
-        ligneIndex = i + 5; // ligne réelle dans le sheet (5 = première ligne données)
+      // C=index 0 (ID), D=index 1 (Nom)
+      if (compRows[i][1] && compRows[i][1].trim() === nom.trim()) {
+        ligneIndex = i + 5;
         break;
       }
     }
@@ -143,8 +143,19 @@ export async function mettreAJourComptabilite(nomEmploye) {
     ];
 
     if (ligneIndex === -1) {
-      // Nouvelle ligne — on cherche la prochaine ligne vide à partir de C5
-      const nextRow = 5 + compRows.filter(r => r[0]).length;
+      // Nouvelle ligne — on prend la première ligne sans ID à partir de C5
+      // On relit toutes les lignes pour trouver la première vraiment vide (colonne D = nom vide)
+      const allRows = await readRange('Comptabilité!C5:D200');
+      let nextRow = 5;
+      for (let i = 0; i < allRows.length; i++) {
+        // Si colonne D (index 1) a un nom, cette ligne est prise
+        if (allRows[i][1] && allRows[i][1].trim() !== '') {
+          nextRow = 5 + i + 1;
+        } else if (!allRows[i][1] || allRows[i][1].trim() === '') {
+          nextRow = 5 + i;
+          break;
+        }
+      }
       await sheets.spreadsheets.values.update({
         spreadsheetId,
         range: `Comptabilité!C${nextRow}:J${nextRow}`,
