@@ -55,16 +55,6 @@ async function sendDiscord(url, embed) {
   catch(e){ console.error('Discord:',e); }
 }
 
-async function updateCell(sheet, row, col, value) {
-  try {
-    const { sheets, spreadsheetId } = await getSheets();
-    const colLetter = String.fromCharCode(64 + col);
-    await sheets.spreadsheets.values.update({
-      spreadsheetId, range:`${sheet}!${colLetter}${row}`,
-      valueInputOption:'USER_ENTERED', requestBody:{values:[[value]]},
-    });
-  } catch(_){}
-}
 
 export async function POST(req) {
   const body = await req.json();
