@@ -673,6 +673,7 @@ export default function Home(){
                   {key:'password',label:'Mot de passe',placeholder:'••••••••',required:true},
                   {key:'nom',label:'Nom & Prénom',placeholder:'John Doe',required:true},
                   {key:'gradeNew',label:'Grade',type:'select',options:GRADES_ORDRE,required:true},
+                  {key:'dateNaissance',label:'Date de naissance',placeholder:'01/01/1990',required:true},
                   {key:'tel',label:'Téléphone',placeholder:'555-0123'},
                   {key:'iban',label:'IBAN',placeholder:'LS64321...'},
                 ]} onSubmit={f=>api('addEmploye',{...f,grade:session?.grade})} btnLabel="➕ Ajouter l'employé"/>
