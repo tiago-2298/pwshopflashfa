@@ -5,31 +5,28 @@ const GRADES_ORDRE  = ['Patron','Co-Patronne','Responsable','Commercial Expert',
 const GRADES_REVENTE= ['Patron','Co-Patronne'];
 const GRADES_ADMIN  = ['Patron','Co-Patronne'];
 const GRADES_STATS  = ['Patron','Co-Patronne','Responsable'];
-const GRADE_COLORS  = {
-  'Patron':'#d4af37','Co-Patronne':'#c9a84c',
-  'Responsable':'#8e44ad','Commercial Expert':'#2980b9',
-  'Commercial Confirmé':'#16a085','Commercial Débutant':'#7f8c8d'
-};
-const PAIE_LABEL = {
-  'Patron':'Base fixe','Co-Patronne':'Base fixe',
-  'Responsable':'Base + 45%','Commercial Expert':'33% des bénéfices',
-  'Commercial Confirmé':'30% des bénéfices','Commercial Débutant':'27% des bénéfices'
-};
+const GRADE_COLORS  = {'Patron':'#d4af37','Co-Patronne':'#c9a84c','Responsable':'#8e44ad','Commercial Expert':'#2980b9','Commercial Confirmé':'#16a085','Commercial Débutant':'#7f8c8d'};
+const PAIE_LABEL    = {'Patron':'Base fixe 20 000 $','Co-Patronne':'Base fixe 20 000 $','Responsable':'Base 10 000 $ + 45% (plaf. 19 000 $)','Commercial Expert':'33% des bénéfices (plaf. 19 000 $)','Commercial Confirmé':'30% des bénéfices (plaf. 19 000 $)','Commercial Débutant':'27% des bénéfices (plaf. 19 000 $)'};
 
-const CSS = `
+const DARK_CSS = `
+  --bg:#040508;--panel:rgba(14,16,22,0.75);--glass:rgba(255,255,255,0.025);--glass-b:rgba(255,255,255,0.07);
+  --txt:#eee8dc;--muted:#6e6a60;--inp-bg:rgba(0,0,0,0.3);--inp-border:rgba(255,255,255,0.07);
+  --card-bg:rgba(14,16,22,0.75);--kpi-bg:rgba(8,10,16,0.85);--tbl-hover:rgba(255,255,255,0.025);
+`;
+const LIGHT_CSS = `
+  --bg:#f5f0e8;--panel:rgba(255,255,255,0.9);--glass:rgba(0,0,0,0.03);--glass-b:rgba(0,0,0,0.08);
+  --txt:#1a1a2e;--muted:#8a7a6a;--inp-bg:rgba(255,255,255,0.8);--inp-border:rgba(0,0,0,0.12);
+  --card-bg:rgba(255,255,255,0.9);--kpi-bg:rgba(255,255,255,0.95);--tbl-hover:rgba(0,0,0,0.02);
+`;
+
+const BASE_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
-:root{
-  --p:#9b1a1a;--p2:#c9a84c;--p-glow:rgba(155,26,26,0.28);
-  --bg:#040508;--panel:rgba(14,16,22,0.75);
-  --glass:rgba(255,255,255,0.025);--glass-b:rgba(255,255,255,0.07);
-  --txt:#eee8dc;--muted:#6e6a60;--radius:22px;
-  --ok:#10b981;--err:#ef4444;
-}
+:root{--p:#9b1a1a;--p2:#c9a84c;--p-glow:rgba(155,26,26,0.28);--radius:22px;--ok:#10b981;--err:#ef4444;}
 *{box-sizing:border-box;margin:0;padding:0;outline:none;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);background-image:radial-gradient(at 5% 10%,rgba(155,26,26,0.08) 0,transparent 50%),radial-gradient(at 95% 90%,rgba(26,39,68,0.1) 0,transparent 50%);color:var(--txt);height:100vh;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;}
+body{background:var(--bg);color:var(--txt);height:100vh;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;transition:background 0.3s,color 0.3s;}
 .app{display:flex;height:100vh;width:100vw;}
 .dock-wrap{padding:16px;height:100vh;display:flex;align-items:center;flex-shrink:0;}
-.dock{width:82px;height:96vh;background:rgba(6,7,12,0.7);backdrop-filter:blur(28px);border:1px solid var(--glass-b);border-radius:36px;display:flex;flex-direction:column;align-items:center;padding:26px 0;transition:width 0.3s cubic-bezier(0.4,0,0.2,1);z-index:100;box-shadow:0 24px 60px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.04);overflow:hidden;}
+.dock{width:82px;height:96vh;background:rgba(6,7,12,0.7);backdrop-filter:blur(28px);border:1px solid var(--glass-b);border-radius:36px;display:flex;flex-direction:column;align-items:center;padding:26px 0;transition:width 0.3s cubic-bezier(0.4,0,0.2,1);z-index:100;box-shadow:0 24px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.04);overflow:hidden;}
 .dock:hover{width:230px;}
 .dock:hover .nl{opacity:1;transform:translateX(0);display:block;}
 .dock:hover .ni{margin-right:13px;}
@@ -55,7 +52,7 @@ body{background:var(--bg);background-image:radial-gradient(at 5% 10%,rgba(155,26
 .lob{background:none;border:none;color:var(--muted);cursor:pointer;padding:10px;border-radius:14px;transition:0.2s;width:80%;display:flex;align-items:center;justify-content:center;}
 .dock:hover .lob{justify-content:flex-start;padding-left:18px;}
 .lob:hover{background:rgba(155,26,26,0.12);color:#f87171;}
-.main{flex:1;overflow-y:auto;padding:36px;scroll-behavior:smooth;}
+.main{flex:1;overflow-y:auto;padding:36px 40px;scroll-behavior:smooth;}
 .main::-webkit-scrollbar{width:4px;}
 .main::-webkit-scrollbar-thumb{background:var(--glass-b);border-radius:4px;}
 .fi{animation:fi 0.35s cubic-bezier(0.2,0.8,0.2,1);}
@@ -64,41 +61,43 @@ body{background:var(--bg);background-image:radial-gradient(at 5% 10%,rgba(155,26
 .toast{position:fixed;top:24px;left:50%;z-index:9999;padding:13px 26px;border-radius:50px;display:flex;align-items:center;gap:12px;font-weight:700;font-size:14px;backdrop-filter:blur(20px);box-shadow:0 20px 50px rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.08);animation:tb 0.48s cubic-bezier(0.175,0.885,0.32,1.275) forwards;}
 @keyframes tb{0%{transform:translate(-50%,-130%);opacity:0;}70%{transform:translate(-50%,7px);}100%{transform:translate(-50%,0);opacity:1;}}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;}
-.modal{background:rgba(10,12,18,0.96);border:1px solid var(--glass-b);border-radius:28px;padding:34px;width:440px;max-width:92vw;box-shadow:0 40px 80px rgba(0,0,0,0.8);animation:pop 0.35s ease;position:relative;overflow:hidden;}
+.modal{background:var(--card-bg);border:1px solid var(--glass-b);border-radius:28px;padding:34px;width:460px;max-width:92vw;box-shadow:0 40px 80px rgba(0,0,0,0.8);animation:pop 0.35s ease;position:relative;overflow:hidden;max-height:90vh;overflow-y:auto;}
 .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--p),var(--p2),transparent);}
-.card{background:var(--panel);border:1px solid var(--glass-b);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden;transition:border-color 0.2s;}
+.card{background:var(--card-bg);border:1px solid var(--glass-b);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden;transition:border-color 0.2s;}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--p),var(--p2),transparent);opacity:0;transition:0.3s;}
 .card:hover::before{opacity:1;}
 .ct{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:14px;}
 .kr{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:16px;}
-.kc{background:rgba(8,10,16,0.85);border:1px solid var(--glass-b);border-radius:20px;padding:18px 20px;transition:0.22s;}
+.kc{background:var(--kpi-bg);border:1px solid var(--glass-b);border-radius:20px;padding:18px 20px;transition:0.22s;}
 .kc:hover{border-color:rgba(201,168,76,0.2);transform:translateY(-2px);}
 .kl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.09em;margin-bottom:7px;}
 .kv{font-size:26px;font-weight:900;letter-spacing:-0.02em;}
 .tbl{width:100%;border-collapse:collapse;font-size:13px;}
 .tbl th{text-align:left;padding:9px 12px;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;border-bottom:1px solid var(--glass-b);}
-.tbl td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.03);}
-.tbl tr:hover td{background:var(--glass);}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--glass-b);}
+.tbl tr:hover td{background:var(--tbl-hover);}
 .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;display:block;font-weight:700;}
-.inp{width:100%;padding:11px 15px;border-radius:13px;border:1px solid var(--glass-b);background:rgba(0,0,0,0.3);color:var(--txt);font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;transition:0.22s;box-sizing:border-box;}
-.inp:focus{border-color:rgba(155,26,26,0.5);background:rgba(155,26,26,0.04);box-shadow:0 0 0 3px rgba(155,26,26,0.08);}
-.inp option{background:#08090f;}
+.inp{width:100%;padding:11px 15px;border-radius:13px;border:1px solid var(--inp-border);background:var(--inp-bg);color:var(--txt);font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;transition:0.22s;box-sizing:border-box;}
+.inp:focus{border-color:rgba(155,26,26,0.5);box-shadow:0 0 0 3px rgba(155,26,26,0.08);}
+.inp option{background:var(--bg);}
 .bp{background:linear-gradient(135deg,var(--p),#7a1414);border:none;border-radius:13px;color:#fff;font-weight:800;font-size:14px;padding:12px 18px;cursor:pointer;width:100%;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:0.02em;transition:0.22s;box-shadow:0 7px 22px var(--p-glow);text-transform:uppercase;}
 .bp:hover{transform:translateY(-2px);box-shadow:0 12px 30px var(--p-glow);}
 .bp:active{transform:scale(0.97);}
-.bp:disabled{background:rgba(255,255,255,0.04);color:var(--muted);box-shadow:none;cursor:not-allowed;transform:none;}
+.bp:disabled{background:var(--glass-b);color:var(--muted);box-shadow:none;cursor:not-allowed;transform:none;}
 .bg{background:var(--glass);border:1px solid var(--glass-b);border-radius:12px;color:var(--txt);font-weight:600;font-size:13px;padding:10px 15px;cursor:pointer;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;transition:0.2s;}
-.bg:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);}
+.bg:hover{background:var(--glass-b);}
+.brd{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:12px;color:#ef4444;font-weight:600;font-size:13px;padding:8px 14px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:0.2s;}
+.brd:hover{background:rgba(239,68,68,0.15);}
 .pill{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--glass-b);background:transparent;color:var(--muted);cursor:pointer;transition:0.2s;font-family:'Plus Jakarta Sans',sans-serif;}
 .pill.on,.pill:hover{background:rgba(155,26,26,0.13);border-color:rgba(155,26,26,0.38);color:#f87171;}
-.pi{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.22);border:1px solid var(--glass-b);border-radius:11px;padding:10px 14px;margin-bottom:6px;}
+.pi{display:flex;align-items:center;justify-content:space-between;background:var(--inp-bg);border:1px solid var(--glass-b);border-radius:11px;padding:10px 14px;margin-bottom:6px;}
 .eg{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:13px;}
-.ec{background:var(--panel);border:1px solid var(--glass-b);border-radius:20px;padding:18px;transition:0.22s;cursor:pointer;}
+.ec{background:var(--card-bg);border:1px solid var(--glass-b);border-radius:20px;padding:18px;transition:0.22s;cursor:pointer;}
 .ec:hover{border-color:rgba(201,168,76,0.18);transform:translateY(-1px);}
 .atab{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
 .at{padding:8px 17px;border-radius:20px;border:1px solid var(--glass-b);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;transition:0.2s;}
 .at.on{background:linear-gradient(135deg,var(--p),#7a1414);color:#fff;border-color:transparent;box-shadow:0 6px 18px var(--p-glow);}
-.reg{background:var(--panel);border:1px solid var(--glass-b);border-radius:20px;overflow:hidden;margin-bottom:10px;}
+.reg{background:var(--card-bg);border:1px solid var(--glass-b);border-radius:20px;overflow:hidden;margin-bottom:10px;}
 .rh{background:rgba(26,39,68,0.3);padding:13px 20px;font-weight:800;font-size:13px;border-bottom:1px solid var(--glass-b);}
 .rb{padding:14px 20px;display:flex;flex-direction:column;gap:9px;}
 .rp{display:flex;gap:9px;font-size:13px;color:var(--muted);line-height:1.6;}
@@ -107,15 +106,18 @@ body{background:var(--bg);background-image:radial-gradient(at 5% 10%,rgba(155,26
 .srch{position:relative;}
 .srch input{padding-left:36px;}
 .srch::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;z-index:1;}
-
-/* Fiche de paie */
-.paie-card{background:linear-gradient(135deg,rgba(155,26,26,0.08),rgba(201,168,76,0.05));border:1px solid rgba(201,168,76,0.2);border-radius:20px;padding:22px;margin-bottom:16px;}
+.paie-card{background:linear-gradient(135deg,rgba(155,26,26,0.07),rgba(201,168,76,0.04));border:1px solid rgba(201,168,76,0.18);border-radius:20px;padding:22px;margin-bottom:16px;}
 .paie-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
 .paie-row:last-child{border:none;padding-top:12px;margin-top:4px;}
 .paie-total{font-size:28px;font-weight:900;color:var(--p2);font-family:monospace;}
-
+.annonce-box{background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(155,26,26,0.05));border:1px solid rgba(201,168,76,0.25);border-radius:16px;padding:16px 20px;margin-bottom:14px;}
+.toggle-theme{background:none;border:1px solid var(--glass-b);border-radius:50px;padding:6px 14px;color:var(--muted);cursor:pointer;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;transition:0.2s;display:flex;align-items:center;gap:8px;}
+.toggle-theme:hover{border-color:var(--p2);color:var(--p2);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-grid .full{grid-column:1/-1;}
+.admin-list-item{display:flex;align-items:center;justify-content:space-between;background:var(--inp-bg);border:1px solid var(--glass-b);border-radius:12px;padding:12px 16px;margin-bottom:8px;}
 .lp{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;}
-.lw{background:rgba(6,7,12,0.88);backdrop-filter:blur(32px);border:1px solid var(--glass-b);border-radius:34px;padding:48px 42px;width:385px;box-shadow:0 40px 90px rgba(0,0,0,0.75);position:relative;overflow:hidden;animation:pop 0.45s ease;}
+.lw{background:var(--card-bg);backdrop-filter:blur(32px);border:1px solid var(--glass-b);border-radius:34px;padding:48px 42px;width:385px;box-shadow:0 40px 90px rgba(0,0,0,0.75);position:relative;overflow:hidden;animation:pop 0.45s ease;}
 .lw::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--p),var(--p2),transparent);}
 `;
 
@@ -124,6 +126,7 @@ async function api(action,data={}){
   return r.json();
 }
 
+// ── Sélecteur d'objet avec recherche ────────────────────────────────────────
 function ObjetSelector({objets,onAdd,mode}){
   const [search,setSearch]=useState('');
   const [cat,setCat]=useState('');
@@ -132,15 +135,14 @@ function ObjetSelector({objets,onAdd,mode}){
   const cats=[...new Set(objets.map(o=>o.categorie))].sort();
   const filtered=objets.filter(o=>(!cat||o.categorie===cat)&&(!search||o.nom.toLowerCase().includes(search.toLowerCase()))).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));
   const selObj=objets.find(o=>o.nom===sel);
-  const prix=selObj?(mode==='rachat'?selObj.prixAchat:mode==='rachatPart'?selObj.prixPartenaire:mode==='revente'?selObj.prixRevente:selObj.prixVente||selObj.prixRevente):0;
-  const benefice=selObj?(mode==='rachat'?selObj.beneficeStd:mode==='rachatPart'?selObj.beneficePart:mode==='vente'?(selObj.prixVente-selObj.prixAchat):0):0;
+  const prix=selObj?(mode==='rachat'?selObj.prixAchat:mode==='rachatPart'?selObj.prixPartenaire:mode==='revente'?selObj.prixRevente:selObj.prixVente||0):0;
+  const benef=selObj?(mode==='rachat'?selObj.beneficeStd:mode==='rachatPart'?selObj.beneficePart:mode==='vente'?(selObj.prixVente-selObj.prixAchat):0):0;
 
   function handleAdd(){
     if(!sel||qty<1)return;
     onAdd({objet:sel,quantite:qty,prix});
     setSel('');setQty(1);
   }
-
   return(
     <div style={{display:'flex',flexDirection:'column',gap:10}}>
       <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
@@ -148,24 +150,18 @@ function ObjetSelector({objets,onAdd,mode}){
       </div>
       <div className="srch"><input className="inp" placeholder="Rechercher un objet…" value={search} onChange={e=>setSearch(e.target.value)}/></div>
       <div style={{display:'flex',gap:8,alignItems:'flex-end',flexWrap:'wrap'}}>
-        <div style={{flex:1,minWidth:180}}>
-          <select className="inp" value={sel} onChange={e=>setSel(e.target.value)}>
-            <option value="">— Sélectionner —</option>
-            {filtered.map(o=><option key={o.nom} value={o.nom}>{o.nom}</option>)}
-          </select>
-        </div>
-        {sel&&(
-          <div style={{display:'flex',gap:8}}>
-            <div style={{background:'rgba(201,168,76,0.08)',border:'1px solid rgba(201,168,76,0.22)',borderRadius:10,padding:'10px 13px',fontSize:12,color:'var(--p2)',fontWeight:700,fontFamily:'monospace',textAlign:'center'}}>
-              <div style={{fontSize:10,color:'var(--muted)',marginBottom:2}}>Prix</div>
-              {prix} $
-            </div>
-            {benefice>0&&<div style={{background:'rgba(16,185,129,0.07)',border:'1px solid rgba(16,185,129,0.2)',borderRadius:10,padding:'10px 13px',fontSize:12,color:'var(--ok)',fontWeight:700,fontFamily:'monospace',textAlign:'center'}}>
-              <div style={{fontSize:10,color:'var(--muted)',marginBottom:2}}>Bénéf.</div>
-              {benefice} $
-            </div>}
+        <select className="inp" style={{flex:1,minWidth:160}} value={sel} onChange={e=>setSel(e.target.value)}>
+          <option value="">— Sélectionner —</option>
+          {filtered.map(o=><option key={o.nom} value={o.nom}>{o.nom}</option>)}
+        </select>
+        {sel&&<div style={{display:'flex',gap:6}}>
+          <div style={{background:'rgba(201,168,76,0.08)',border:'1px solid rgba(201,168,76,0.22)',borderRadius:10,padding:'10px 13px',fontSize:12,color:'var(--p2)',fontWeight:700,fontFamily:'monospace',textAlign:'center',minWidth:70}}>
+            <div style={{fontSize:9,color:'var(--muted)',marginBottom:2}}>PRIX</div>{prix} $
           </div>
-        )}
+          {benef>0&&<div style={{background:'rgba(16,185,129,0.06)',border:'1px solid rgba(16,185,129,0.18)',borderRadius:10,padding:'10px 13px',fontSize:12,color:'var(--ok)',fontWeight:700,fontFamily:'monospace',textAlign:'center',minWidth:70}}>
+            <div style={{fontSize:9,color:'var(--muted)',marginBottom:2}}>BÉNÉF.</div>{benef} $
+          </div>}
+        </div>}
         <input type="number" className="inp" style={{width:70,textAlign:'center'}} value={qty} min={1} onChange={e=>setQty(Math.max(1,parseInt(e.target.value)||1))}/>
         <button onClick={handleAdd} disabled={!sel} className="bg">+ Ajouter</button>
       </div>
@@ -173,26 +169,30 @@ function ObjetSelector({objets,onAdd,mode}){
   );
 }
 
+// ── Modal confirmation ───────────────────────────────────────────────────────
 function ConfirmModal({data,onConfirm,onCancel}){
   if(!data)return null;
   return(
     <div className="overlay" onClick={onCancel}>
-      <div className="modal" onClick={e=>e.stopPropagation()}>
+      <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:400}}>
         <div style={{textAlign:'center',marginBottom:20}}>
-          <div style={{fontSize:38,marginBottom:10}}>🔐</div>
+          <div style={{fontSize:38,marginBottom:10}}>{data.icon||'🔐'}</div>
           <div style={{fontSize:18,fontWeight:800,marginBottom:8}}>{data.titre}</div>
           <div style={{color:'var(--muted)',fontSize:14,lineHeight:1.6}}>{data.texte}</div>
         </div>
-        <div style={{background:'rgba(0,0,0,0.3)',borderRadius:13,padding:14,marginBottom:18,fontSize:13,display:'flex',flexDirection:'column',gap:6}}>{data.details}</div>
+        {data.details&&<div style={{background:'var(--inp-bg)',borderRadius:13,padding:14,marginBottom:18,fontSize:13,display:'flex',flexDirection:'column',gap:6}}>{data.details}</div>}
         <div style={{display:'flex',gap:10}}>
           <button onClick={onCancel} className="bg" style={{flex:1,padding:'12px'}}>Annuler</button>
-          <button onClick={onConfirm} className="bp" style={{flex:1}}>✅ Confirmer</button>
+          <button onClick={onConfirm} className={data.danger?'brd bp':'bp'} style={{flex:1,background:data.danger?'rgba(239,68,68,0.15)':undefined,color:data.danger?'#ef4444':undefined,border:data.danger?'1px solid rgba(239,68,68,0.4)':undefined,boxShadow:'none',textTransform:'none',fontSize:14}}>
+            {data.btnLabel||'✅ Confirmer'}
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
+// ── Module transaction ───────────────────────────────────────────────────────
 function TransactionModule({title,subtitle,objets,mode,employe,grade,partenaires,onSuccess}){
   const [cNom,setCNom]=useState('');
   const [cTel,setCTel]=useState('');
@@ -204,8 +204,8 @@ function TransactionModule({title,subtitle,objets,mode,employe,grade,partenaires
   const [confirm,setConfirm]=useState(null);
 
   const total=panier.reduce((s,i)=>s+i.prix*i.quantite,0);
-  const needClient=mode==='rachat'||mode==='vente';
-  const needIban=mode==='rachat';
+  const needClient=mode==='rachat'||mode==='vente'||mode==='rachatPart';
+  const needIban=mode==='rachat'||mode==='rachatPart';
   const needEntreprise=mode==='rachatPart';
 
   function addToCart(item){
@@ -223,8 +223,9 @@ function TransactionModule({title,subtitle,objets,mode,employe,grade,partenaires
       titre:'Confirmer la transaction',
       texte:`Validation du ${mode==='rachat'?'rachat standard':mode==='rachatPart'?'rachat partenaire':mode==='revente'?'revente':'vente catalogue'}.`,
       details:<>
-        {needClient&&<div>👤 Client : <strong>{cNom}</strong> — {cTel}</div>}
-        {needEntreprise&&<div>🏢 Entreprise : <strong>{entreprise}</strong></div>}
+        {needEntreprise&&<div>🏢 <strong>{entreprise}</strong></div>}
+        {needClient&&<div>👤 <strong>{cNom}</strong> — {cTel}</div>}
+        {needIban&&<div>💳 {cIban}</div>}
         <div>📦 {panier.length} article{panier.length>1?'s':''} — <strong style={{color:'var(--p2)'}}>{total.toFixed(0)} $</strong></div>
       </>,
     });
@@ -252,21 +253,24 @@ function TransactionModule({title,subtitle,objets,mode,employe,grade,partenaires
       <div className="pg">{title}</div>
       <div className="ps">{subtitle}</div>
       <ConfirmModal data={confirm} onConfirm={valider} onCancel={()=>setConfirm(null)}/>
-      <div style={{maxWidth:640,display:'flex',flexDirection:'column',gap:14}}>
+      <div style={{maxWidth:660,display:'flex',flexDirection:'column',gap:14,margin:'0 auto'}}>
         {(needClient||needEntreprise)&&(
           <div className="card">
-            <div className="ct">{needEntreprise?'Entreprise partenaire':'Informations client'}</div>
-            {needEntreprise
-              ?<select className="inp" value={entreprise} onChange={e=>setEntreprise(e.target.value)}>
-                <option value="">— Sélectionner l'entreprise —</option>
-                {partenaires.map(p=><option key={p} value={p}>{p}</option>)}
-              </select>
-              :<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-                <div><label className="lbl">Nom & Prénom</label><input className="inp" value={cNom} onChange={e=>setCNom(e.target.value)} placeholder="Bob Smith"/></div>
-                <div><label className="lbl">Téléphone</label><input className="inp" value={cTel} onChange={e=>setCTel(e.target.value)} placeholder="555-0123"/></div>
-                {needIban&&<div style={{gridColumn:'1/-1'}}><label className="lbl">IBAN</label><input className="inp" value={cIban} onChange={e=>setCIban(e.target.value)} placeholder="LS64321..."/></div>}
+            <div className="ct">{needEntreprise?'Partenaire & Client':'Informations client'}</div>
+            {needEntreprise&&(
+              <div style={{marginBottom:12}}>
+                <label className="lbl">Entreprise partenaire</label>
+                <select className="inp" value={entreprise} onChange={e=>setEntreprise(e.target.value)}>
+                  <option value="">— Sélectionner l'entreprise —</option>
+                  {partenaires.map(p=><option key={p.nom} value={p.nom}>{p.nom}</option>)}
+                </select>
               </div>
-            }
+            )}
+            <div className="form-grid">
+              <div><label className="lbl">Nom & Prénom</label><input className="inp" value={cNom} onChange={e=>setCNom(e.target.value)} placeholder="Bob Smith"/></div>
+              <div><label className="lbl">Téléphone</label><input className="inp" value={cTel} onChange={e=>setCTel(e.target.value)} placeholder="555-0123"/></div>
+              {needIban&&<div className="full"><label className="lbl">IBAN</label><input className="inp" value={cIban} onChange={e=>setCIban(e.target.value)} placeholder="LS64321..."/></div>}
+            </div>
           </div>
         )}
         <div className="card">
@@ -292,7 +296,7 @@ function TransactionModule({title,subtitle,objets,mode,employe,grade,partenaires
               ))}
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid var(--glass-b)',paddingTop:13,marginTop:8}}>
                 <span style={{color:'var(--muted)',fontSize:13}}>Total</span>
-                <span style={{color:'var(--p)',fontSize:26,fontWeight:900,fontFamily:'monospace',textShadow:'0 0 20px var(--p-glow)'}}>{total.toFixed(0)} $</span>
+                <span style={{color:'var(--p)',fontSize:26,fontWeight:900,fontFamily:'monospace'}}>{total.toFixed(0)} $</span>
               </div>
             </>
           }
@@ -306,41 +310,49 @@ function TransactionModule({title,subtitle,objets,mode,employe,grade,partenaires
   );
 }
 
-function AdminForm({fields,onSubmit,btnLabel}){
-  const init=Object.fromEntries(fields.map(f=>[f.key,f.default||'']));
+// ── Admin — formulaire générique ─────────────────────────────────────────────
+function AdminForm({fields,onSubmit,btnLabel,initialValues={}}){
+  const init=Object.fromEntries(fields.map(f=>[f.key,initialValues[f.key]||f.default||'']));
   const [form,setForm]=useState(init);
   const [loading,setLoading]=useState(false);
   const [msg,setMsg]=useState('');
+  useEffect(()=>{ setForm(Object.fromEntries(fields.map(f=>[f.key,initialValues[f.key]||f.default||'']))); },[JSON.stringify(initialValues)]);
   async function submit(e){
     e.preventDefault();setLoading(true);setMsg('');
     const r=await onSubmit(form);setLoading(false);
-    if(r?.ok){setMsg('✅ Ajouté avec succès !');setForm(init);}
+    if(r?.ok){setMsg('✅ Enregistré !');if(!Object.keys(initialValues).length)setForm(init);}
     else setMsg('❌ '+(r?.error||'Erreur.'));
   }
   return(
-    <form onSubmit={submit} style={{maxWidth:500,display:'flex',flexDirection:'column',gap:12}}>
-      {fields.map(f=>(
-        <div key={f.key}>
-          <label className="lbl">{f.label}</label>
-          {f.type==='select'
-            ?<select className="inp" value={form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} required={f.required}>
-              <option value="">— Choisir —</option>
-              {f.options.map(o=><option key={o} value={o}>{o}</option>)}
-            </select>
-            :<input className="inp" type={f.type||'text'} placeholder={f.placeholder} value={form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} required={f.required}/>
-          }
-        </div>
-      ))}
+    <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:12}}>
+      <div className="form-grid">
+        {fields.map(f=>(
+          <div key={f.key} className={f.full?'full':''}>
+            <label className="lbl">{f.label}</label>
+            {f.type==='select'
+              ?<select className="inp" value={form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} required={f.required}>
+                <option value="">— Choisir —</option>
+                {f.options.map(o=><option key={o} value={o}>{o}</option>)}
+              </select>
+              :f.type==='textarea'
+              ?<textarea className="inp" placeholder={f.placeholder} value={form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} required={f.required} style={{minHeight:80,resize:'vertical'}}/>
+              :<input className="inp" type={f.type||'text'} placeholder={f.placeholder} value={form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} required={f.required}/>
+            }
+          </div>
+        ))}
+      </div>
       {msg&&<div style={{fontSize:13,padding:'10px 14px',borderRadius:11,background:msg.startsWith('✅')?'rgba(16,185,129,0.07)':'rgba(155,26,26,0.09)',border:`1px solid ${msg.startsWith('✅')?'rgba(16,185,129,0.2)':'rgba(155,26,26,0.25)'}`,color:msg.startsWith('✅')?'#10b981':'#f87171'}}>{msg}</div>}
       <button type="submit" disabled={loading} className="bp" style={{opacity:loading?0.6:1}}>{loading?'Enregistrement…':btnLabel}</button>
     </form>
   );
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
 export default function Home(){
   const [view,setView]=useState('login');
   const [session,setSession]=useState(null);
   const [tab,setTab]=useState('dashboard');
+  const [theme,setTheme]=useState('dark');
   const [objets,setObjets]=useState([]);
   const [catalogue,setCatalogue]=useState([]);
   const [partenaires,setPartenaires]=useState([]);
@@ -352,20 +364,32 @@ export default function Home(){
   const [pass,setPass]=useState('');
   const [toast,setToast]=useState(null);
   const [empModal,setEmpModal]=useState(null);
+  const [editModal,setEditModal]=useState(null);
+  const [confirm,setConfirm]=useState(null);
   const [adminTab,setAdminTab]=useState('employes');
   const [search,setSearch]=useState('');
   const [fGrade,setFGrade]=useState('');
   const timerRef=useRef(null);
 
   useEffect(()=>{
+    const saved=localStorage.getItem('pawntheme')||'dark';
+    setTheme(saved);
+  },[]);
+
+  function toggleTheme(){
+    const t=theme==='dark'?'light':'dark';
+    setTheme(t);
+    localStorage.setItem('pawntheme',t);
+  }
+
+  useEffect(()=>{
     if(view!=='app')return;
     const reset=()=>{
       clearTimeout(timerRef.current);
-      timerRef.current=setTimeout(()=>{notify('Session expirée après 8h','err');logout();},8*60*60*1000);
+      timerRef.current=setTimeout(()=>{notify('Session expirée','err');logout();},8*60*60*1000);
     };
     reset();
-    window.addEventListener('mousemove',reset);
-    window.addEventListener('keydown',reset);
+    window.addEventListener('mousemove',reset);window.addEventListener('keydown',reset);
     return()=>{clearTimeout(timerRef.current);window.removeEventListener('mousemove',reset);window.removeEventListener('keydown',reset);};
   },[view]);
 
@@ -407,9 +431,12 @@ export default function Home(){
     {id:'revente',e:'🔄',l:'Revente',r:'revente'},
     {id:'annuaire',e:'👥',l:'Annuaire'},
     {id:'admin',e:'⚙️',l:'Administration',r:'admin'},
-    {id:'reglement',e:'📜',l:'Règlement'},
+    {id:'parametres',e:'🎨',l:'Paramètres'},
   ];
 
+  const CSS = `${BASE_CSS}:root{${theme==='dark'?DARK_CSS:LIGHT_CSS}}body{background-image:${theme==='dark'?"radial-gradient(at 5% 10%,rgba(155,26,26,0.08) 0,transparent 50%),radial-gradient(at 95% 90%,rgba(26,39,68,0.1) 0,transparent 50%)":'none'};}`;
+
+  // ── LOGIN ──────────────────────────────────────────────────────────────────
   if(view==='login') return(
     <div className="app"><style jsx global>{CSS}</style>
       <div className="lp">
@@ -432,9 +459,11 @@ export default function Home(){
     </div>
   );
 
+  // ── APP ────────────────────────────────────────────────────────────────────
   return(
     <div className="app"><style jsx global>{CSS}</style>
       {toast&&<div className="toast" style={{background:toast.t==='ok'?'rgba(16,185,129,0.12)':'rgba(155,26,26,0.15)',color:toast.t==='ok'?'#10b981':'#f87171',border:`1px solid ${toast.t==='ok'?'rgba(16,185,129,0.25)':'rgba(155,26,26,0.35)'}`}}>{toast.text}</div>}
+      <ConfirmModal data={confirm} onConfirm={confirm?.onConfirm} onCancel={()=>setConfirm(null)}/>
 
       {/* Modal fiche employé */}
       {empModal&&(
@@ -443,43 +472,25 @@ export default function Home(){
             <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:20}}>
               <div style={{position:'relative'}}>
                 <div style={{width:48,height:48,borderRadius:'50%',background:'linear-gradient(135deg,var(--p),#7a1414)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:900,fontSize:20,color:'#fff',boxShadow:'0 4px 14px var(--p-glow)'}}>{empModal.nom[0]}</div>
-                <div style={{position:'absolute',bottom:0,right:0,width:12,height:12,borderRadius:'50%',background:empModal.isOnline?'var(--ok)':'var(--muted)',border:'2px solid #0a0c12'}}/>
+                <div style={{position:'absolute',bottom:0,right:0,width:12,height:12,borderRadius:'50%',background:empModal.isOnline?'var(--ok)':'var(--muted)',border:'2px solid var(--bg)'}}/>
               </div>
               <div>
                 <div style={{fontWeight:800,fontSize:17,marginBottom:4}}>{empModal.nom}</div>
-                <span style={{fontSize:11,padding:'2px 9px',borderRadius:20,background:'rgba(255,255,255,0.06)',border:'1px solid var(--glass-b)',color:GRADE_COLORS[empModal.grade]||'var(--muted)',fontWeight:700}}>{empModal.grade}</span>
+                <span style={{fontSize:11,padding:'2px 9px',borderRadius:20,background:'var(--glass)',border:'1px solid var(--glass-b)',color:GRADE_COLORS[empModal.grade]||'var(--muted)',fontWeight:700}}>{empModal.grade}</span>
               </div>
               <div style={{marginLeft:'auto',fontSize:12,color:empModal.isOnline?'var(--ok)':'var(--muted)'}}>{empModal.isOnline?'🟢 En ligne':'⚫ Hors ligne'}</div>
             </div>
-
-            {/* Fiche de paie */}
             <div className="paie-card">
-              <div style={{fontSize:11,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:14,fontWeight:700}}>
-                💰 Fiche de paie — Semaine en cours
-              </div>
-              {empModal.paie?.base>0&&(
-                <div className="paie-row">
-                  <span style={{color:'var(--muted)',fontSize:13}}>Salaire de base</span>
-                  <span style={{fontFamily:'monospace',fontWeight:700}}>{empModal.paie.base.toLocaleString()} $</span>
-                </div>
-              )}
+              <div style={{fontSize:11,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:14,fontWeight:700}}>💰 Fiche de paie — semaine en cours</div>
+              {empModal.paie?.base>0&&<div className="paie-row"><span style={{color:'var(--muted)',fontSize:13}}>Salaire de base</span><span style={{fontFamily:'monospace',fontWeight:700}}>{empModal.paie.base.toLocaleString()} $</span></div>}
+              <div className="paie-row"><span style={{color:'var(--muted)',fontSize:13}}>Bénéfices rapportés</span><span style={{fontFamily:'monospace',fontWeight:700}}>{empModal.benefTotalSemaine?.toFixed(0)||0} $</span></div>
+              {empModal.paie?.taux>0&&<div className="paie-row"><span style={{color:'var(--muted)',fontSize:13}}>Commission ({Math.round((empModal.paie.taux||0)*100)}%)</span><span style={{fontFamily:'monospace',fontWeight:700,color:'var(--ok)'}}>{empModal.paie.commission?.toFixed(0)||0} $</span></div>}
               <div className="paie-row">
-                <span style={{color:'var(--muted)',fontSize:13}}>Bénéfices rapportés</span>
-                <span style={{fontFamily:'monospace',fontWeight:700}}>{empModal.benefTotalSemaine?.toFixed(0)||0} $</span>
-              </div>
-              {empModal.paie?.taux>0&&(
-                <div className="paie-row">
-                  <span style={{color:'var(--muted)',fontSize:13}}>Commission ({Math.round((empModal.paie.taux||0)*100)}%)</span>
-                  <span style={{fontFamily:'monospace',fontWeight:700,color:'var(--ok)'}}>{empModal.paie.commission?.toFixed(0)||0} $</span>
-                </div>
-              )}
-              <div className="paie-row" style={{borderTop:'1px solid rgba(201,168,76,0.2)',marginTop:4}}>
                 <span style={{fontWeight:800,fontSize:14}}>Total à percevoir</span>
                 <span className="paie-total">{empModal.paie?.total?.toLocaleString()||0} $</span>
               </div>
-              <div style={{fontSize:11,color:'var(--muted)',marginTop:10,textAlign:'center'}}>{PAIE_LABEL[empModal.grade]||''}</div>
+              <div style={{fontSize:11,color:'var(--muted)',marginTop:8,textAlign:'center'}}>{PAIE_LABEL[empModal.grade]||''}</div>
             </div>
-
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:14}}>
               <div className="kc"><div className="kl">Bénéfices totaux</div><div className="kv" style={{color:'var(--p2)',fontSize:20}}>{empModal.beneficeTotal?.toFixed(0)||0} $</div></div>
               <div className="kc"><div className="kl">Transactions</div><div className="kv" style={{color:'var(--p)',fontSize:20}}>{empModal.transactions||0}</div></div>
@@ -487,9 +498,30 @@ export default function Home(){
             <div style={{display:'flex',flexDirection:'column',gap:6,fontSize:13,marginBottom:16}}>
               <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Téléphone</span><span style={{fontFamily:'monospace'}}>{empModal.tel}</span></div>
               <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>IBAN</span><span style={{fontFamily:'monospace',fontSize:11}}>{empModal.iban}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Date de naissance</span><span>{empModal.dateNaissance||'—'}</span></div>
               <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Dernière connexion</span><span style={{fontSize:12}}>{empModal.derniereConnexion}</span></div>
             </div>
             <button onClick={()=>setEmpModal(null)} className="bg" style={{width:'100%',padding:'11px'}}>Fermer</button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal édition (admin) */}
+      {editModal&&(
+        <div className="overlay" onClick={()=>setEditModal(null)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div style={{fontWeight:800,fontSize:16,marginBottom:20}}>{editModal.titre}</div>
+            <AdminForm
+              fields={editModal.fields}
+              initialValues={editModal.initialValues}
+              onSubmit={async(f)=>{
+                const r=await editModal.onSubmit(f);
+                if(r?.ok){setEditModal(null);loadAll();notify(editModal.successMsg||'Modifié !');}
+                return r;
+              }}
+              btnLabel={editModal.btnLabel||'💾 Enregistrer'}
+            />
+            <button onClick={()=>setEditModal(null)} className="bg" style={{width:'100%',marginTop:10,padding:'10px'}}>Annuler</button>
           </div>
         </div>
       )}
@@ -519,9 +551,10 @@ export default function Home(){
         </div>
       </div>
 
+      {/* MAIN */}
       <main className="main">
 
-        {/* DASHBOARD */}
+        {/* ═══ DASHBOARD ═══ */}
         {tab==='dashboard'&&(
           <div className="fi">
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:4}}>
@@ -530,19 +563,32 @@ export default function Home(){
             </div>
             <div className="ps">Semaine du {stats?.semaine?.debut} au {stats?.semaine?.fin}</div>
 
-            {/* Fiche de paie personnelle */}
+            {/* Annonces */}
+            {stats?.annonces?.length>0&&stats.annonces.map((a,i)=>(
+              <div key={i} className="annonce-box">
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+                  <div>
+                    <div style={{fontSize:11,color:'var(--p2)',fontWeight:700,marginBottom:6,textTransform:'uppercase',letterSpacing:'0.06em'}}>📢 Annonce de {a.auteur} — {a.date}</div>
+                    <div style={{fontSize:14,lineHeight:1.6}}>{a.texte}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Fiche de paie */}
             {stats?.paie&&(
               <div className="paie-card" style={{marginBottom:16}}>
                 <div style={{fontSize:11,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:14,fontWeight:700}}>💰 Ma fiche de paie — semaine en cours</div>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:12}}>
                   {stats.paie.base>0&&<div><div className="kl">Base</div><div style={{fontWeight:800,fontSize:18,fontFamily:'monospace'}}>{stats.paie.base.toLocaleString()} $</div></div>}
                   <div><div className="kl">Bénéf. rapportés</div><div style={{fontWeight:800,fontSize:18,fontFamily:'monospace',color:'var(--ok)'}}>{stats.benefTotalSemaine?.toFixed(0)||0} $</div></div>
                   {stats.paie.taux>0&&<div><div className="kl">Commission ({Math.round(stats.paie.taux*100)}%)</div><div style={{fontWeight:800,fontSize:18,fontFamily:'monospace',color:'var(--ok)'}}>{stats.paie.commission?.toFixed(0)||0} $</div></div>}
                 </div>
                 <div style={{borderTop:'1px solid rgba(201,168,76,0.2)',marginTop:14,paddingTop:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                  <span style={{fontWeight:800,fontSize:14}}>Total à percevoir cette semaine</span>
+                  <span style={{fontWeight:800,fontSize:14}}>Total à percevoir</span>
                   <span className="paie-total">{stats.paie.total?.toLocaleString()||0} $</span>
                 </div>
+                <div style={{fontSize:11,color:'var(--muted)',marginTop:8}}>{PAIE_LABEL[session?.grade]||''}</div>
               </div>
             )}
 
@@ -569,20 +615,22 @@ export default function Home(){
             {stats?.history?.length>0&&(
               <div className="card" style={{marginBottom:14}}>
                 <div className="ct">Mes 10 dernières transactions</div>
-                <table className="tbl">
-                  <thead><tr><th>Date</th><th>Objet</th><th>Type</th><th style={{textAlign:'right'}}>Total</th><th style={{textAlign:'right'}}>Bénéfice</th></tr></thead>
-                  <tbody>
-                    {stats.history.slice(0,10).map((h,i)=>(
-                      <tr key={i}>
-                        <td style={{color:'var(--muted)',fontSize:12}}>{h.date}</td>
-                        <td style={{fontWeight:600}}>{h.objet}</td>
-                        <td><span style={{fontSize:11,padding:'2px 8px',borderRadius:20,background:'rgba(255,255,255,0.05)',border:'1px solid var(--glass-b)',color:'var(--muted)'}}>{h.type||'rachat'}</span></td>
-                        <td style={{textAlign:'right',fontFamily:'monospace'}}>{h.totalClient?.toFixed(0)||0} $</td>
-                        <td style={{textAlign:'right',color:'var(--p2)',fontFamily:'monospace',fontWeight:700}}>{h.benefice?.toFixed(0)||0} $</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div style={{overflowX:'auto'}}>
+                  <table className="tbl">
+                    <thead><tr><th>Date</th><th>Objet</th><th>Type</th><th style={{textAlign:'right'}}>Total</th><th style={{textAlign:'right'}}>Bénéfice</th></tr></thead>
+                    <tbody>
+                      {stats.history.slice(0,10).map((h,i)=>(
+                        <tr key={i}>
+                          <td style={{color:'var(--muted)',fontSize:12}}>{h.date}</td>
+                          <td style={{fontWeight:600}}>{h.objet}</td>
+                          <td><span style={{fontSize:10,padding:'2px 8px',borderRadius:20,background:'var(--glass)',border:'1px solid var(--glass-b)',color:'var(--muted)'}}>{h.type||'rachat'}</span></td>
+                          <td style={{textAlign:'right',fontFamily:'monospace'}}>{h.totalClient?.toFixed(0)||0} $</td>
+                          <td style={{textAlign:'right',color:'var(--p2)',fontFamily:'monospace',fontWeight:700}}>{h.benefice?.toFixed(0)||0} $</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
@@ -590,13 +638,13 @@ export default function Home(){
               <div className="card">
                 <div className="ct">🏆 Classement des employés</div>
                 <table className="tbl">
-                  <thead><tr><th style={{width:36}}>#</th><th>Employé</th><th>Grade</th><th style={{textAlign:'right'}}>Bénéfices</th><th style={{textAlign:'right'}}>Tx</th></tr></thead>
+                  <thead><tr><th style={{width:36}}>#</th><th>Employé</th><th>Grade</th><th style={{textAlign:'right'}}>Bénéfices</th><th style={{textAlign:'right'}}>Transactions</th></tr></thead>
                   <tbody>
                     {stats.classement.map((e,i)=>(
                       <tr key={e.nom}>
-                        <td style={{color:'var(--muted)',fontWeight:700}}>{i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
+                        <td style={{fontWeight:700}}>{i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
                         <td style={{fontWeight:700}}>{e.nom}</td>
-                        <td><span style={{fontSize:10,padding:'2px 8px',borderRadius:20,background:'rgba(255,255,255,0.05)',border:'1px solid var(--glass-b)',color:GRADE_COLORS[e.grade]||'var(--muted)',fontWeight:700}}>{e.grade}</span></td>
+                        <td><span style={{fontSize:10,padding:'2px 8px',borderRadius:20,background:'var(--glass)',border:'1px solid var(--glass-b)',color:GRADE_COLORS[e.grade]||'var(--muted)',fontWeight:700}}>{e.grade}</span></td>
                         <td style={{textAlign:'right',color:'var(--p2)',fontFamily:'monospace',fontWeight:700}}>{e.benefice?.toFixed(0)||0} $</td>
                         <td style={{textAlign:'right',color:'var(--muted)'}}>{e.transactions}</td>
                       </tr>
@@ -608,18 +656,19 @@ export default function Home(){
           </div>
         )}
 
+        {/* ═══ TRANSACTIONS ═══ */}
         {tab==='rachat'&&<TransactionModule title="Rachat Standard 🛍️" subtitle="Rachat classique d'un objet client" objets={objets} mode="rachat" employe={session?.nom} grade={session?.grade} partenaires={partenaires} onSuccess={()=>{loadAll();notify('Rachat enregistré !');}}/>}
         {tab==='rachatPart'&&<TransactionModule title="Rachat Partenaire 🤝" subtitle="Prix majoré pour les entreprises partenaires" objets={objets} mode="rachatPart" employe={session?.nom} grade={session?.grade} partenaires={partenaires} onSuccess={()=>{loadAll();notify('Rachat partenaire enregistré !');}}/>}
         {tab==='vente'&&<TransactionModule title="Vente Catalogue 🏪" subtitle="Vendre les produits du catalogue" objets={catalogue} mode="vente" employe={session?.nom} grade={session?.grade} partenaires={partenaires} onSuccess={()=>{loadAll();notify('Vente enregistrée !');}}/>}
         {tab==='revente'&&canRevente&&<TransactionModule title="Revente Interne 🔄" subtitle="Patron / Co-Patronne uniquement" objets={objets} mode="revente" employe={session?.nom} grade={session?.grade} partenaires={partenaires} onSuccess={()=>notify('Revente enregistrée !')}/>}
 
-        {/* ANNUAIRE */}
+        {/* ═══ ANNUAIRE ═══ */}
         {tab==='annuaire'&&(
           <div className="fi">
             <div className="pg">Annuaire 👥</div>
             <div className="ps">{employes.length} employé{employes.length>1?'s':''}</div>
-            <div style={{display:'flex',gap:10,marginBottom:18}}>
-              <div className="srch" style={{flex:1}}><input className="inp" placeholder="Rechercher un employé…" value={search} onChange={e=>setSearch(e.target.value)}/></div>
+            <div style={{display:'flex',gap:10,marginBottom:18,flexWrap:'wrap'}}>
+              <div className="srch" style={{flex:1,minWidth:200}}><input className="inp" placeholder="Rechercher un employé…" value={search} onChange={e=>setSearch(e.target.value)}/></div>
               <select className="inp" style={{width:210}} value={fGrade} onChange={e=>setFGrade(e.target.value)}>
                 <option value="">Tous les grades</option>
                 {GRADES_ORDRE.map(g=><option key={g} value={g}>{g}</option>)}
@@ -642,10 +691,10 @@ export default function Home(){
                           <div style={{color:'var(--muted)',fontSize:11,marginTop:1}}>@{emp.username}</div>
                         </div>
                       </div>
-                      <span style={{fontSize:10,padding:'2px 8px',borderRadius:20,background:'rgba(255,255,255,0.05)',border:'1px solid var(--glass-b)',color:GRADE_COLORS[emp.grade]||'var(--muted)',fontWeight:700,whiteSpace:'nowrap'}}>{emp.grade}</span>
+                      <span style={{fontSize:10,padding:'2px 8px',borderRadius:20,background:'var(--glass)',border:'1px solid var(--glass-b)',color:GRADE_COLORS[emp.grade]||'var(--muted)',fontWeight:700,whiteSpace:'nowrap'}}>{emp.grade}</span>
                     </div>
                     <div style={{borderTop:'1px solid var(--glass-b)',paddingTop:9,display:'flex',justifyContent:'space-between',fontSize:12}}>
-                      <span style={{color:'var(--p2)',fontFamily:'monospace',fontWeight:700}}>{emp.paie?.total?.toLocaleString()||0} $ <span style={{color:'var(--muted)',fontWeight:400,fontFamily:'sans-serif'}}>/ sem.</span></span>
+                      <span style={{color:'var(--p2)',fontFamily:'monospace',fontWeight:700}}>{emp.paie?.total?.toLocaleString()||0} $ <span style={{color:'var(--muted)',fontWeight:400,fontFamily:'sans-serif'}}>/sem.</span></span>
                       <span style={{color:emp.isOnline?'var(--ok)':'var(--muted)'}}>{emp.isOnline?'🟢':'⚫'} {emp.transactions||0} tx</span>
                     </div>
                   </div>
@@ -655,88 +704,269 @@ export default function Home(){
           </div>
         )}
 
-        {/* ADMIN */}
+        {/* ═══ ADMIN ═══ */}
         {tab==='admin'&&canAdmin&&(
           <div className="fi">
             <div className="pg">Administration ⚙️</div>
-            <div className="ps">Gestion des employés, objets, catalogue et partenaires</div>
+            <div className="ps">Gestion complète du Pawnopoly</div>
             <div className="atab">
-              {[{id:'employes',l:'👤 Employés'},{id:'objets',l:'📦 Objets'},{id:'catalogue',l:'🏪 Catalogue'},{id:'partenaires',l:'🤝 Partenaires'}].map(a=>(
+              {[{id:'employes',l:'👤 Employés'},{id:'objets',l:'📦 Objets'},{id:'catalogue',l:'🏪 Catalogue'},{id:'partenaires',l:'🤝 Partenaires'},{id:'annonces',l:'📢 Annonces'}].map(a=>(
                 <button key={a.id} onClick={()=>setAdminTab(a.id)} className={`at${adminTab===a.id?' on':''}`}>{a.l}</button>
               ))}
             </div>
+
+            {/* Employés */}
             {adminTab==='employes'&&(
-              <div className="card">
-                <div className="ct">Ajouter un employé</div>
-                <AdminForm fields={[
-                  {key:'username',label:'Identifiant',placeholder:'john_doe',required:true},
-                  {key:'password',label:'Mot de passe',placeholder:'••••••••',required:true},
-                  {key:'nom',label:'Nom & Prénom',placeholder:'John Doe',required:true},
-                  {key:'gradeNew',label:'Grade',type:'select',options:GRADES_ORDRE,required:true},
-                  {key:'dateNaissance',label:'Date de naissance',placeholder:'01/01/1990',required:true},
-                  {key:'tel',label:'Téléphone',placeholder:'555-0123'},
-                  {key:'iban',label:'IBAN',placeholder:'LS64321...'},
-                ]} onSubmit={f=>api('addEmploye',{...f,grade:session?.grade})} btnLabel="➕ Ajouter l'employé"/>
+              <div style={{display:'flex',flexDirection:'column',gap:14}}>
+                <div className="card">
+                  <div className="ct">Ajouter un employé</div>
+                  <AdminForm
+                    fields={[
+                      {key:'username',label:'Identifiant',placeholder:'john_doe',required:true},
+                      {key:'password',label:'Mot de passe',placeholder:'••••••••',required:true},
+                      {key:'nom',label:'Nom & Prénom',placeholder:'John Doe',required:true,full:true},
+                      {key:'gradeNew',label:'Grade',type:'select',options:GRADES_ORDRE,required:true},
+                      {key:'dateNaissance',label:'Date de naissance',placeholder:'01/01/1990',required:true},
+                      {key:'tel',label:'Téléphone',placeholder:'555-0123'},
+                      {key:'iban',label:'IBAN',placeholder:'LS64321...',full:true},
+                    ]}
+                    onSubmit={f=>api('addEmploye',{...f,grade:session?.grade})}
+                    btnLabel="➕ Ajouter l'employé"
+                  />
+                </div>
+                <div className="card">
+                  <div className="ct">Employés existants</div>
+                  {employes.map(emp=>(
+                    <div key={emp.username} className="admin-list-item">
+                      <div>
+                        <div style={{fontWeight:700,fontSize:14}}>{emp.nom}</div>
+                        <div style={{fontSize:12,color:'var(--muted)'}}>{emp.grade} — @{emp.username} {emp.statut==='inactif'&&<span style={{color:'var(--err)',marginLeft:4}}>• Désactivé</span>}</div>
+                      </div>
+                      <div style={{display:'flex',gap:8'}}>
+                        <button className="bg" style={{fontSize:12,padding:'6px 12px'}} onClick={()=>setEditModal({
+                          titre:`Modifier ${emp.nom}`,
+                          fields:[
+                            {key:'gradeNew',label:'Grade',type:'select',options:GRADES_ORDRE},
+                            {key:'password',label:'Nouveau mot de passe',placeholder:'Laisser vide = inchangé'},
+                            {key:'tel',label:'Téléphone',placeholder:emp.tel},
+                            {key:'iban',label:'IBAN',placeholder:emp.iban,full:true},
+                            {key:'statut',label:'Statut',type:'select',options:['actif','inactif']},
+                          ],
+                          initialValues:{gradeNew:emp.grade,tel:emp.tel,iban:emp.iban,statut:emp.statut||'actif'},
+                          onSubmit:f=>api('editEmploye',{...f,username:emp.username,grade:session?.grade}),
+                          successMsg:'Employé modifié !',
+                          btnLabel:'💾 Enregistrer',
+                        })}>✏️ Modifier</button>
+                        <button className="brd" style={{fontSize:12,padding:'6px 12px'}} onClick={()=>setConfirm({
+                          titre:'Supprimer cet employé ?',
+                          texte:`${emp.nom} sera supprimé définitivement.`,
+                          icon:'⚠️',danger:true,btnLabel:'🗑️ Supprimer',
+                          onConfirm:async()=>{
+                            await api('deleteEmploye',{username:emp.username,grade:session?.grade});
+                            setConfirm(null);loadAll();notify('Employé supprimé.');
+                          }
+                        })}>🗑️</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* Objets */}
             {adminTab==='objets'&&(
-              <div className="card">
-                <div className="ct">Ajouter un objet rachetable</div>
-                <AdminForm fields={[
-                  {key:'nom',label:"Nom de l'objet",placeholder:'Montre en or',required:true},
-                  {key:'prixAchat',label:'Prix achat standard ($)',type:'number',placeholder:'500',required:true},
-                  {key:'prixPartenaire',label:'Prix achat partenaire ($)',type:'number',placeholder:'650',required:true},
-                  {key:'beneficeStd',label:'Bénéfice standard ($)',type:'number',placeholder:'400',required:true},
-                  {key:'beneficePart',label:'Bénéfice partenaire ($)',type:'number',placeholder:'250',required:true},
-                  {key:'prixRevente',label:'Prix revente ($)',type:'number',placeholder:'900',required:true},
-                  {key:'categorie',label:'Catégorie',placeholder:'Bijoux',required:true},
-                ]} onSubmit={f=>api('addObjet',{...f,grade:session?.grade})} btnLabel="➕ Ajouter l'objet"/>
+              <div style={{display:'flex',flexDirection:'column',gap:14}}>
+                <div className="card">
+                  <div className="ct">Ajouter un objet</div>
+                  <AdminForm
+                    fields={[
+                      {key:'nom',label:"Nom de l'objet",placeholder:'Montre en or',required:true,full:true},
+                      {key:'prixAchat',label:'Prix achat standard ($)',type:'number',placeholder:'500',required:true},
+                      {key:'prixPartenaire',label:'Prix achat partenaire ($)',type:'number',placeholder:'650',required:true},
+                      {key:'beneficeStd',label:'Bénéfice standard ($)',type:'number',placeholder:'400',required:true},
+                      {key:'beneficePart',label:'Bénéfice partenaire ($)',type:'number',placeholder:'250',required:true},
+                      {key:'prixRevente',label:'Prix revente ($)',type:'number',placeholder:'900',required:true},
+                      {key:'categorie',label:'Catégorie',placeholder:'Bijoux',required:true},
+                    ]}
+                    onSubmit={f=>api('addObjet',{...f,grade:session?.grade})}
+                    btnLabel="➕ Ajouter l'objet"
+                  />
+                </div>
+                <div className="card">
+                  <div className="ct">Objets existants ({objets.length})</div>
+                  {objets.map(obj=>(
+                    <div key={obj.nom} className="admin-list-item">
+                      <div>
+                        <div style={{fontWeight:700,fontSize:14}}>{obj.nom}</div>
+                        <div style={{fontSize:12,color:'var(--muted)'}}>Achat: {obj.prixAchat}$ | Part: {obj.prixPartenaire}$ | Revente: {obj.prixRevente}$ | {obj.categorie}</div>
+                      </div>
+                      <div style={{display:'flex',gap:8}}>
+                        <button className="bg" style={{fontSize:12,padding:'6px 12px'}} onClick={()=>setEditModal({
+                          titre:`Modifier ${obj.nom}`,
+                          fields:[
+                            {key:'nom',label:'Nom',required:true,full:true},
+                            {key:'prixAchat',label:'Prix achat ($)',type:'number'},
+                            {key:'prixPartenaire',label:'Prix partenaire ($)',type:'number'},
+                            {key:'beneficeStd',label:'Bénéfice std ($)',type:'number'},
+                            {key:'beneficePart',label:'Bénéfice part ($)',type:'number'},
+                            {key:'prixRevente',label:'Prix revente ($)',type:'number'},
+                            {key:'categorie',label:'Catégorie'},
+                          ],
+                          initialValues:{nom:obj.nom,prixAchat:obj.prixAchat,prixPartenaire:obj.prixPartenaire,beneficeStd:obj.beneficeStd,beneficePart:obj.beneficePart,prixRevente:obj.prixRevente,categorie:obj.categorie},
+                          onSubmit:f=>api('editObjet',{...f,nomOriginal:obj.nom,grade:session?.grade}),
+                          successMsg:'Objet modifié !',
+                        })}>✏️</button>
+                        <button className="brd" style={{fontSize:12,padding:'6px 12px'}} onClick={()=>setConfirm({
+                          titre:'Supprimer cet objet ?',texte:`"${obj.nom}" sera supprimé.`,icon:'⚠️',danger:true,btnLabel:'🗑️ Supprimer',
+                          onConfirm:async()=>{await api('deleteObjet',{nom:obj.nom,grade:session?.grade});setConfirm(null);loadAll();notify('Objet supprimé.');}
+                        })}>🗑️</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* Catalogue */}
             {adminTab==='catalogue'&&(
-              <div className="card">
-                <div className="ct">Ajouter un article catalogue</div>
-                <AdminForm fields={[
-                  {key:'nom',label:"Nom de l'article",placeholder:'Rolex Submariner',required:true},
-                  {key:'prixAchat',label:"Prix d'achat ($)",type:'number',placeholder:'800',required:true},
-                  {key:'prixVente',label:'Prix de vente ($)',type:'number',placeholder:'1200',required:true},
-                  {key:'categorie',label:'Catégorie',placeholder:'Montres',required:true},
-                  {key:'image',label:'URL image',placeholder:'https://...'},
-                ]} onSubmit={f=>api('addCatalogue',{...f,grade:session?.grade})} btnLabel="➕ Ajouter au catalogue"/>
+              <div style={{display:'flex',flexDirection:'column',gap:14}}>
+                <div className="card">
+                  <div className="ct">Ajouter un article catalogue</div>
+                  <AdminForm
+                    fields={[
+                      {key:'nom',label:"Nom de l'article",placeholder:'Rolex Submariner',required:true,full:true},
+                      {key:'prixAchat',label:"Prix d'achat ($)",type:'number',placeholder:'800',required:true},
+                      {key:'prixVente',label:'Prix de vente ($)',type:'number',placeholder:'1200',required:true},
+                      {key:'categorie',label:'Catégorie',placeholder:'Montres',required:true},
+                      {key:'image',label:'URL image',placeholder:'https://...',full:true},
+                    ]}
+                    onSubmit={f=>api('addCatalogue',{...f,grade:session?.grade})}
+                    btnLabel="➕ Ajouter au catalogue"
+                  />
+                </div>
+                <div className="card">
+                  <div className="ct">Articles existants ({catalogue.length})</div>
+                  {catalogue.map(art=>(
+                    <div key={art.nom} className="admin-list-item">
+                      <div style={{display:'flex',alignItems:'center',gap:10}}>
+                        {art.image&&<img src={art.image} alt="" style={{width:36,height:36,borderRadius:8,objectFit:'cover'}} onError={e=>e.target.style.display='none'}/>}
+                        <div>
+                          <div style={{fontWeight:700,fontSize:14}}>{art.nom}</div>
+                          <div style={{fontSize:12,color:'var(--muted)'}}>Achat: {art.prixAchat}$ → Vente: {art.prixVente}$ | Bénéf: {art.benefice}$ | {art.categorie}</div>
+                        </div>
+                      </div>
+                      <div style={{display:'flex',gap:8}}>
+                        <button className="bg" style={{fontSize:12,padding:'6px 12px'}} onClick={()=>setEditModal({
+                          titre:`Modifier ${art.nom}`,
+                          fields:[
+                            {key:'nom',label:'Nom',required:true,full:true},
+                            {key:'prixAchat',label:"Prix d'achat ($)",type:'number'},
+                            {key:'prixVente',label:'Prix de vente ($)',type:'number'},
+                            {key:'categorie',label:'Catégorie'},
+                            {key:'image',label:'URL image',full:true},
+                          ],
+                          initialValues:{nom:art.nom,prixAchat:art.prixAchat,prixVente:art.prixVente,categorie:art.categorie,image:art.image},
+                          onSubmit:f=>api('editCatalogue',{...f,nomOriginal:art.nom,grade:session?.grade}),
+                          successMsg:'Article modifié !',
+                        })}>✏️</button>
+                        <button className="brd" style={{fontSize:12,padding:'6px 12px'}} onClick={()=>setConfirm({
+                          titre:'Supprimer cet article ?',texte:`"${art.nom}" sera supprimé.`,icon:'⚠️',danger:true,btnLabel:'🗑️ Supprimer',
+                          onConfirm:async()=>{await api('deleteCatalogue',{nom:art.nom,grade:session?.grade});setConfirm(null);loadAll();notify('Article supprimé.');}
+                        })}>🗑️</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* Partenaires */}
             {adminTab==='partenaires'&&(
-              <div className="card">
-                <div className="ct">Ajouter un partenaire</div>
-                <AdminForm fields={[{key:'nom',label:"Nom de l'entreprise",placeholder:'Mechanic Inc.',required:true}]} onSubmit={f=>api('addPartenaire',{...f,grade:session?.grade})} btnLabel="➕ Ajouter le partenaire"/>
+              <div style={{display:'flex',flexDirection:'column',gap:14}}>
+                <div className="card">
+                  <div className="ct">Ajouter un partenaire</div>
+                  <AdminForm
+                    fields={[{key:'nom',label:"Nom de l'entreprise",placeholder:'Mechanic Inc.',required:true,full:true}]}
+                    onSubmit={f=>api('addPartenaire',{...f,grade:session?.grade})}
+                    btnLabel="➕ Ajouter le partenaire"
+                  />
+                </div>
+                <div className="card">
+                  <div className="ct">Partenaires existants ({partenaires.length})</div>
+                  {partenaires.map((p,i)=>(
+                    <div key={i} className="admin-list-item">
+                      <span style={{fontWeight:700}}>{p.nom}</span>
+                      <button className="brd" style={{fontSize:12,padding:'6px 12px'}} onClick={()=>setConfirm({
+                        titre:'Supprimer ce partenaire ?',texte:`"${p.nom}" sera supprimé.`,icon:'⚠️',danger:true,btnLabel:'🗑️ Supprimer',
+                        onConfirm:async()=>{await api('deletePartenaire',{ligne:p.ligne,grade:session?.grade});setConfirm(null);loadAll();notify('Partenaire supprimé.');}
+                      })}>🗑️ Supprimer</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Annonces */}
+            {adminTab==='annonces'&&(
+              <div style={{display:'flex',flexDirection:'column',gap:14}}>
+                <div className="card">
+                  <div className="ct">Poster une annonce</div>
+                  <AdminForm
+                    fields={[{key:'texte',label:'Texte de l\'annonce',type:'textarea',placeholder:'Information importante pour toute l\'équipe…',required:true,full:true}]}
+                    onSubmit={f=>api('addAnnonce',{...f,auteur:session?.nom,grade:session?.grade})}
+                    btnLabel="📢 Publier l'annonce"
+                  />
+                </div>
+                <div className="card">
+                  <div className="ct">Annonces actives</div>
+                  {(stats?.annonces||[]).length===0&&<div style={{color:'var(--muted)',fontSize:14,textAlign:'center',padding:'20px 0'}}>Aucune annonce active</div>}
+                  {(stats?.annonces||[]).map((a,i)=>(
+                    <div key={i} className="admin-list-item" style={{alignItems:'flex-start'}}>
+                      <div>
+                        <div style={{fontSize:12,color:'var(--muted)',marginBottom:4}}>{a.auteur} — {a.date}</div>
+                        <div style={{fontSize:14}}>{a.texte}</div>
+                      </div>
+                      <button className="brd" style={{fontSize:12,padding:'6px 12px',flexShrink:0,marginLeft:12}} onClick={()=>setConfirm({
+                        titre:'Supprimer cette annonce ?',texte:'Elle ne sera plus visible.',icon:'⚠️',danger:true,btnLabel:'🗑️ Supprimer',
+                        onConfirm:async()=>{await api('deleteAnnonce',{ligne:a.ligne,grade:session?.grade});setConfirm(null);loadAll();notify('Annonce supprimée.');}
+                      })}>🗑️</button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
         )}
 
-        {/* RÈGLEMENT */}
-        {tab==='reglement'&&(
-          <div className="fi" style={{maxWidth:700}}>
-            <div className="pg">Règlement Intérieur 📜</div>
-            <div className="ps">Document officiel — applicable à tous les employés</div>
-            <div style={{background:'rgba(155,26,26,0.07)',border:'1px solid rgba(155,26,26,0.2)',borderRadius:13,padding:'11px 17px',color:'#f87171',fontSize:13,marginBottom:16,display:'flex',gap:9}}>
-              <span>⚠️</span><span>La lecture et le respect de ce règlement sont obligatoires pour tout employé.</span>
-            </div>
-            {[
-              {t:'1. Comportement & Professionnalisme',p:['Toujours se présenter avec courtoisie et professionnalisme.','Le vouvoiement est de mise avec les clients.','Tout comportement irrespectueux est passible de sanction.']},
-              {t:'2. Gestion des Rachats',p:['Chaque rachat doit être enregistré dès la transaction.',"Vérifiez toujours l'identité du client avant d'enregistrer.",'Ne jamais racheter à un prix non validé par la direction.']},
-              {t:'3. Revente & Vente',p:['La revente interne est réservée au Patron et Co-Patronne.','Les prix sont fixés par la direction.','Tout écart de caisse doit être signalé dans les 24h.']},
-              {t:'4. Confidentialité',p:["Les informations clients sont strictement confidentielles.",'Il est interdit de partager ces données hors du cadre professionnel.']},
-              {t:'5. Hiérarchie',p:['Commercial → Responsable → Co-Patronne → Patron.','Les décisions de la direction sont finales.']},
-              {t:'6. Sanctions',p:['Tout manquement peut entraîner avertissement, rétrogradation ou licenciement.','Les fraudes entraîneront un licenciement immédiat.']},
-            ].map(s=>(
-              <div key={s.t} className="reg">
-                <div className="rh">{s.t}</div>
-                <div className="rb">{s.p.map((p,i)=><div key={i} className="rp"><span style={{color:'var(--p)',flexShrink:0,fontWeight:700}}>›</span><span>{p}</span></div>)}</div>
+        {/* ═══ PARAMÈTRES ═══ */}
+        {tab==='parametres'&&(
+          <div className="fi" style={{maxWidth:500}}>
+            <div className="pg">Paramètres 🎨</div>
+            <div className="ps">Personnalisation de l'interface</div>
+            <div className="card">
+              <div className="ct">Apparence</div>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div>
+                  <div style={{fontWeight:700,fontSize:15,marginBottom:4}}>{theme==='dark'?'Mode sombre 🌙':'Mode clair ☀️'}</div>
+                  <div style={{color:'var(--muted)',fontSize:13}}>Changer l'apparence de l'interface</div>
+                </div>
+                <button onClick={toggleTheme} className="toggle-theme">
+                  {theme==='dark'?'☀️ Mode clair':'🌙 Mode sombre'}
+                </button>
               </div>
-            ))}
+            </div>
+            <div className="card" style={{marginTop:14}}>
+              <div className="ct">Mon compte</div>
+              <div style={{display:'flex',flexDirection:'column',gap:8,fontSize:14}}>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Nom</span><strong>{session?.nom}</strong></div>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Grade</span><span style={{color:GRADE_COLORS[session?.grade]||'var(--txt)',fontWeight:700}}>{session?.grade}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>Téléphone</span><span style={{fontFamily:'monospace'}}>{session?.tel||'—'}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'var(--muted)'}}>IBAN</span><span style={{fontFamily:'monospace',fontSize:12}}>{session?.iban||'—'}</span></div>
+              </div>
+            </div>
           </div>
         )}
+
       </main>
     </div>
   );
