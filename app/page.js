@@ -742,7 +742,7 @@ export default function Home(){
                         <div style={{fontWeight:700,fontSize:14}}>{emp.nom}</div>
                         <div style={{fontSize:12,color:'var(--muted)'}}>{emp.grade} — @{emp.username} {emp.statut==='inactif'&&<span style={{color:'var(--err)',marginLeft:4}}>• Désactivé</span>}</div>
                       </div>
-                      <div style={{display:'flex',gap:8'}}>
+                      <div style={{display:'flex',gap:8}}>
                         <button className="bg" style={{fontSize:12,padding:'6px 12px'}} onClick={()=>setEditModal({
                           titre:`Modifier ${emp.nom}`,
                           fields:[
